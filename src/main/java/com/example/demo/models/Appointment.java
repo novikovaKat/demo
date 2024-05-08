@@ -1,9 +1,7 @@
 package com.example.demo.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.example.demo.models.enums.AppointmentStatus;
+import jakarta.persistence.*;
 
 import java.time.Instant;
 import java.util.Objects;
@@ -15,14 +13,19 @@ public class Appointment {
     @Id
     @Column (name = "uuid")
     private UUID uuid;
-    @Column (name = "patient_id")
-    private UUID patientId;
-    @Column (name = "doctor_id")
-    private UUID doctorId;
+
+    @ManyToOne
+    @JoinColumn(name = "patient_id")
+    private Account patient;
+
+    @ManyToOne
+    @JoinColumn(name = "doctor_id")
+    private Doctor doctor;
+
     @Column (name = "appointment_date")
     private Instant appointmentDate;
     @Column (name = "status")
-    private Statuses status;
+    private AppointmentStatus status;
 
     public UUID getUuid() {
         return uuid;
@@ -32,20 +35,20 @@ public class Appointment {
         this.uuid = uuid;
     }
 
-    public UUID getPatientId() {
-        return patientId;
+    public Account getPatient() {
+        return patient;
     }
 
-    public void setPatientId(UUID patientId) {
-        this.patientId = patientId;
+    public void setPatient(Account patient) {
+        this.patient = patient;
     }
 
-    public UUID getDoctorId() {
-        return doctorId;
+    public Doctor getDoctor() {
+        return doctor;
     }
 
-    public void setDoctorId(UUID doctorId) {
-        this.doctorId = doctorId;
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
     }
 
     public Instant getAppointmentDate() {
@@ -56,24 +59,27 @@ public class Appointment {
         this.appointmentDate = appointmentDate;
     }
 
-    public Statuses getStatus() {
+    public AppointmentStatus getStatus() {
         return status;
     }
 
-    public void setStatus(Statuses status) {
+    public void setStatus(AppointmentStatus status) {
         this.status = status;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Appointment)) return false;
-        Appointment that = (Appointment) o;
-        return uuid.equals(that.uuid) && patientId.equals(that.patientId) && doctorId.equals(that.doctorId) && appointmentDate.equals(that.appointmentDate) && status == that.status;
+        if (!(o instanceof Appointment that)) return false;
+        return Objects.equals(uuid, that.uuid)
+                && Objects.equals(patient, that.patient)
+                && Objects.equals(doctor, that.doctor)
+                && Objects.equals(appointmentDate, that.appointmentDate)
+                && status == that.status;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uuid, patientId, doctorId, appointmentDate, status);
+        return Objects.hash(uuid, patient, doctor, appointmentDate, status);
     }
 }

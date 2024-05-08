@@ -5,7 +5,6 @@ import java.util.UUID;
 public record DoctorResponse(
         UUID doctorId,
         String firstName,
-        String lastName,
-        String specialty
+        String lastName
 ) {
 }

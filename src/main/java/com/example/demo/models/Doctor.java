@@ -14,8 +14,12 @@ public class Doctor{
     @OneToOne
     @JoinColumn(name = "account_id")
     private Account account;
-    @Column (name = "specialty")
-    private String specialty;
+
+    @Column(name = "education")
+    private String education;
+
+    @Column(name = "experience")
+    private String experience;
 
     public UUID getUuid() {
         return uuid;
@@ -33,12 +37,20 @@ public class Doctor{
         this.account = account;
     }
 
-    public String getSpecialty() {
-        return specialty;
+    public String getEducation() {
+        return education;
     }
 
-    public void setSpecialty(String specialty) {
-        this.specialty = specialty;
+    public void setEducation(String education) {
+        this.education = education;
+    }
+
+    public String getExperience() {
+        return experience;
+    }
+
+    public void setExperience(String experience) {
+        this.experience = experience;
     }
 
     @Override
@@ -46,11 +58,11 @@ public class Doctor{
         if (this == o) return true;
         if (!(o instanceof Doctor)) return false;
         Doctor doctor = (Doctor) o;
-        return uuid.equals(doctor.uuid) && account.equals(doctor.account) && specialty.equals(doctor.specialty);
+        return uuid.equals(doctor.uuid) && account.equals(doctor.account) && Objects.equals(education, doctor.education) && Objects.equals(experience, doctor.experience);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uuid, account, specialty);
+        return Objects.hash(uuid, account, education, experience);
     }
 }
