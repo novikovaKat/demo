@@ -20,7 +20,7 @@ public class DoctorsServiceImpl implements DoctorService{
     @Override
     public List<DoctorViewResponse> getAllDoctorsInfo() {
         return this.doctorRepository.findAll().stream()
-                .map(doctor -> new DoctorViewResponse(doctor.getUuid(), doctor.getAccount().getFirstName(), doctor.getAccount().getLastName()))
+                .map(doctor -> new DoctorViewResponse(doctor.getUuid(), doctor.getAccount().getFirstName(), doctor.getAccount().getLastName(), doctor.getSpecialties()))
                 .collect(Collectors.toList());
     }
 
@@ -31,6 +31,9 @@ public class DoctorsServiceImpl implements DoctorService{
         return new DoctorResponse(
                 doctor.getUuid(),
                 doctor.getAccount().getFirstName(),
-                doctor.getAccount().getLastName());
+                doctor.getAccount().getLastName(),
+                doctor.getEducation(),
+                doctor.getExperience(),
+                doctor.getSpecialties());
     }
 }

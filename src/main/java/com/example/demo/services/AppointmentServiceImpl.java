@@ -20,6 +20,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class AppointmentServiceImpl implements AppointmentService {
@@ -94,14 +95,39 @@ public class AppointmentServiceImpl implements AppointmentService {
         return new AppointmentResponse(
                 savedAppointment.getUuid(),
                 savedAppointment.getDoctor().getUuid(),
+                savedAppointment.getDoctor().getAccount().getFirstName(),
+                savedAppointment.getDoctor().getAccount().getLastName(),
                 savedAppointment.getPatient().getUuid(),
-                savedAppointment.getAppointmentDate().atZone(DEFAULT_TIMEZONE_ID).toLocalDate(),
+                savedAppointment.getPatient().getFirstName(),
+                savedAppointment.getPatient().getLastName(),
+                savedAppointment.getAppointmentDate().atZone(DEFAULT_TIMEZONE_ID).toLocalDate().format(DateTimeFormatter.ofPattern("dd.MM.uu")),
                 savedAppointment.getAppointmentDate(),
-                savedAppointment.getAppointmentDate().plus(15, ChronoUnit.MINUTES));
+                savedAppointment.getAppointmentDate().plus(15, ChronoUnit.MINUTES),
+                savedAppointment.getAppointmentDate().atZone(DEFAULT_TIMEZONE_ID).toLocalTime().format(DateTimeFormatter.ofPattern("dd.MM.uu")),
+                savedAppointment.getStatus());
     }
 
     @Override
     public Appointment cancelAppointment(UUID appointmentId) {
         return null;
+    }
+
+    @Override
+    public List<AppointmentResponse> getAppointmentsByPatientId(UUID patientId) {
+        return this.appointmentRepository.findAllByPatientUuid(patientId).stream()
+                .map(appointment -> new AppointmentResponse(
+                        appointment.getUuid(),
+                        appointment.getDoctor().getUuid(),
+                        appointment.getDoctor().getAccount().getFirstName(),
+                        appointment.getDoctor().getAccount().getLastName(),
+                        appointment.getPatient().getUuid(),
+                        appointment.getPatient().getFirstName(),
+                        appointment.getPatient().getLastName(),
+                        appointment.getAppointmentDate().atZone(DEFAULT_TIMEZONE_ID).toLocalDate().format(DateTimeFormatter.ofPattern("dd.MM.uu")),
+                        appointment.getAppointmentDate(),
+                        appointment.getAppointmentDate().plus(15, ChronoUnit.MINUTES),
+                        appointment.getAppointmentDate().atZone(DEFAULT_TIMEZONE_ID).toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+                        appointment.getStatus()))
+                .collect(Collectors.toList());
     }
 }

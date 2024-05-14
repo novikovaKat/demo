@@ -15,4 +15,6 @@ public interface AppointmentService {
     AppointmentResponse createAppointment(final CreateAppointmentRequest request);
 
     Appointment cancelAppointment(final UUID appointmentId);
+
+    List<AppointmentResponse> getAppointmentsByPatientId(final UUID patientId);
 }

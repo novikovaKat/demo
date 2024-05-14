@@ -16,4 +16,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
             @Param("doctorId") final UUID doctorId,
             @Param("startUtc") final Instant startUtc,
             @Param("endUtc") final Instant endUtc);
+
+    List<Appointment> findAllByPatientUuid(final UUID patientId);
+
 }
