@@ -20,6 +20,9 @@ public class Doctor{
     @Column(name = "experience")
     private String experience;
 
+    @Column(name = "status")
+    private Boolean status;
+
     @ManyToMany
     @JoinTable(
             name = "doctor_specialty",
@@ -55,6 +58,14 @@ public class Doctor{
         return experience;
     }
 
+    public Boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(Boolean status) {
+        this.status = status;
+    }
+
     public void setExperience(String experience) {
         this.experience = experience;
     }
@@ -72,11 +83,11 @@ public class Doctor{
         if (this == o) return true;
         if (!(o instanceof Doctor)) return false;
         Doctor doctor = (Doctor) o;
-        return uuid.equals(doctor.uuid) && account.equals(doctor.account) && Objects.equals(education, doctor.education) && Objects.equals(experience, doctor.experience) && Objects.equals(specialties, doctor.specialties);
+        return uuid.equals(doctor.uuid) && account.equals(doctor.account) && Objects.equals(education, doctor.education) && Objects.equals(experience, doctor.experience) && status.equals(doctor.status) && Objects.equals(specialties, doctor.specialties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uuid, account, education, experience, specialties);
+        return Objects.hash(uuid, account, education, experience, status, specialties);
     }
 }

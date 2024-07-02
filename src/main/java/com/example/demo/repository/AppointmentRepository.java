@@ -1,6 +1,7 @@
 package com.example.demo.repository;
 
 import com.example.demo.models.Appointment;
+import com.example.demo.models.enums.AppointmentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,5 +19,11 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
             @Param("endUtc") final Instant endUtc);
 
     List<Appointment> findAllByPatientUuid(final UUID patientId);
+
+    List<Appointment> findAllByDoctorAccountUuid(final UUID doctorId);
+
+    List<Appointment> findByStatusAndAppointmentDateIsBefore(final AppointmentStatus status, final Instant appointmentDate);
+
+
 
 }

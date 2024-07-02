@@ -11,6 +11,7 @@ import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.AppointmentRepository;
 import com.example.demo.repository.DoctorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
@@ -103,18 +104,81 @@ public class AppointmentServiceImpl implements AppointmentService {
                 savedAppointment.getAppointmentDate().atZone(DEFAULT_TIMEZONE_ID).toLocalDate().format(DateTimeFormatter.ofPattern("dd.MM.uu")),
                 savedAppointment.getAppointmentDate(),
                 savedAppointment.getAppointmentDate().plus(15, ChronoUnit.MINUTES),
-                savedAppointment.getAppointmentDate().atZone(DEFAULT_TIMEZONE_ID).toLocalTime().format(DateTimeFormatter.ofPattern("dd.MM.uu")),
+                savedAppointment.getAppointmentDate().atZone(DEFAULT_TIMEZONE_ID).toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")),
                 savedAppointment.getStatus());
     }
 
     @Override
-    public Appointment cancelAppointment(UUID appointmentId) {
-        return null;
+    public AppointmentResponse cancelAppointment(UUID appointmentId) {
+        Appointment appointment = this.appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new RuntimeException("No such appointment"));
+        appointment.setStatus(AppointmentStatus.CANCELLED);
+        Appointment updatedAppointment = this.appointmentRepository.save(appointment);
+
+        return new AppointmentResponse(
+                updatedAppointment.getUuid(),
+                updatedAppointment.getDoctor().getUuid(),
+                updatedAppointment.getDoctor().getAccount().getFirstName(),
+                updatedAppointment.getDoctor().getAccount().getLastName(),
+                updatedAppointment.getPatient().getUuid(),
+                updatedAppointment.getPatient().getFirstName(),
+                updatedAppointment.getPatient().getLastName(),
+                updatedAppointment.getAppointmentDate().atZone(DEFAULT_TIMEZONE_ID).toLocalDate().format(DateTimeFormatter.ofPattern("dd.MM.uu")),
+                updatedAppointment.getAppointmentDate(),
+                updatedAppointment.getAppointmentDate().plus(15, ChronoUnit.MINUTES),
+                updatedAppointment.getAppointmentDate().atZone(DEFAULT_TIMEZONE_ID).toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+                updatedAppointment.getStatus());
+    }
+
+    @Scheduled(cron = "0 * * * * ?")
+    @Override
+    public void markExpiredAppointments() {
+        final List<Appointment> expiredAppointments = this.appointmentRepository.findByStatusAndAppointmentDateIsBefore(AppointmentStatus.ACTIVE, Instant.now().minus(15, ChronoUnit.MINUTES));
+        expiredAppointments.forEach(ea -> ea.setStatus(AppointmentStatus.EXPIRED));
+        this.appointmentRepository.saveAll(expiredAppointments);
     }
 
     @Override
     public List<AppointmentResponse> getAppointmentsByPatientId(UUID patientId) {
         return this.appointmentRepository.findAllByPatientUuid(patientId).stream()
+                .map(appointment -> new AppointmentResponse(
+                        appointment.getUuid(),
+                        appointment.getDoctor().getUuid(),
+                        appointment.getDoctor().getAccount().getFirstName(),
+                        appointment.getDoctor().getAccount().getLastName(),
+                        appointment.getPatient().getUuid(),
+                        appointment.getPatient().getFirstName(),
+                        appointment.getPatient().getLastName(),
+                        appointment.getAppointmentDate().atZone(DEFAULT_TIMEZONE_ID).toLocalDate().format(DateTimeFormatter.ofPattern("dd.MM.uu")),
+                        appointment.getAppointmentDate(),
+                        appointment.getAppointmentDate().plus(15, ChronoUnit.MINUTES),
+                        appointment.getAppointmentDate().atZone(DEFAULT_TIMEZONE_ID).toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+                        appointment.getStatus()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AppointmentResponse> getAppointmentsByDoctorId(UUID doctorId) {
+        return this.appointmentRepository.findAllByDoctorAccountUuid(doctorId).stream()
+                .map(appointment -> new AppointmentResponse(
+                        appointment.getUuid(),
+                        appointment.getDoctor().getUuid(),
+                        appointment.getDoctor().getAccount().getFirstName(),
+                        appointment.getDoctor().getAccount().getLastName(),
+                        appointment.getPatient().getUuid(),
+                        appointment.getPatient().getFirstName(),
+                        appointment.getPatient().getLastName(),
+                        appointment.getAppointmentDate().atZone(DEFAULT_TIMEZONE_ID).toLocalDate().format(DateTimeFormatter.ofPattern("dd.MM.uu")),
+                        appointment.getAppointmentDate(),
+                        appointment.getAppointmentDate().plus(15, ChronoUnit.MINUTES),
+                        appointment.getAppointmentDate().atZone(DEFAULT_TIMEZONE_ID).toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+                        appointment.getStatus()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AppointmentResponse> getAllAppointments() {
+        return this.appointmentRepository.findAll().stream()
                 .map(appointment -> new AppointmentResponse(
                         appointment.getUuid(),
                         appointment.getDoctor().getUuid(),
