@@ -1,6 +1,5 @@
 package com.example.demo.services;
 
-import com.example.demo.models.Appointment;
 import com.example.demo.models.request.CreateAppointmentRequest;
 import com.example.demo.models.response.AppointmentResponse;
 import com.example.demo.models.response.AvailableAppointmentIntervalResponse;

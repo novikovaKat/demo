@@ -10,7 +10,6 @@ import com.example.demo.models.response.DoctorViewResponse;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.AppointmentRepository;
 import com.example.demo.repository.DoctorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,15 +19,15 @@ import java.util.stream.Collectors;
 
 @Service
 public class DoctorsServiceImpl implements DoctorService{
-
-    @Autowired
     private DoctorRepository doctorRepository;
-
-    @Autowired
     private AccountRepository accountRepository;
-
-    @Autowired
     private AppointmentRepository appointmentRepository;
+
+    public DoctorsServiceImpl(DoctorRepository doctorRepository, AccountRepository accountRepository, AppointmentRepository appointmentRepository) {
+        this.doctorRepository = doctorRepository;
+        this.accountRepository = accountRepository;
+        this.appointmentRepository = appointmentRepository;
+    }
 
     @Override
     public List<DoctorViewResponse> getAllDoctorsInfo() {

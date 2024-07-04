@@ -1,26 +1,29 @@
 package com.example.demo.controllers;
 
-import com.example.demo.models.request.CreateAppointmentRequest;
-import com.example.demo.models.response.*;
+import com.example.demo.models.response.DoctorAdministrativeResponse;
+import com.example.demo.models.response.DoctorResponse;
+import com.example.demo.models.response.DoctorViewResponse;
 import com.example.demo.services.AppointmentService;
 import com.example.demo.services.DoctorService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/doctors")
+@RequestMapping("/doctor")
 @CrossOrigin
 public class DoctorController {
 
-    @Autowired
     private DoctorService doctorService;
-    @Autowired
     private AppointmentService appointmentService;
 
-    @GetMapping
+    public DoctorController(DoctorService doctorService, AppointmentService appointmentService) {
+        this.doctorService = doctorService;
+        this.appointmentService = appointmentService;
+    }
+
+    @GetMapping("/all")
     public List<DoctorViewResponse> getAllActiveDoctorsInfo(){
         return this.doctorService.getAllActiveDoctorsInfo();
     }
@@ -31,17 +34,13 @@ public class DoctorController {
         return this.doctorService.getDoctorByUuid(doctorId);
     }
 
-    @GetMapping("/{doctorId}/detailed")
-    public DoctorAdministrativeResponse getDetailedDoctorByUuid(@PathVariable final UUID doctorId){
-        return this.doctorService.getDetailedDoctorByUuid(doctorId);
-    }
-    @GetMapping("/{doctorId}/appointments")
-    public List<AvailableAppointmentIntervalResponse> getDoctorAppointmentIntervals(@PathVariable final UUID doctorId){
-        return this.appointmentService.getDoctorAppointmentIntervals(doctorId);
+    @GetMapping("/{accountId}")
+    public DoctorResponse getDoctorByAccountId(@PathVariable final UUID accountId){
+        return doctorService.getDoctorByAccountId(accountId);
     }
 
-    @PostMapping("/appointment")
-    public AppointmentResponse createAppointment(@RequestBody final CreateAppointmentRequest request){
-        return this.appointmentService.createAppointment(request);
+    @GetMapping("/{doctorId}/details")
+    public DoctorAdministrativeResponse getDetailedDoctorByUuid(@PathVariable final UUID doctorId){
+        return this.doctorService.getDetailedDoctorByUuid(doctorId);
     }
 }

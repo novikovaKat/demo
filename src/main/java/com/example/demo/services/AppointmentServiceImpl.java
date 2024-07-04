@@ -10,7 +10,6 @@ import com.example.demo.models.response.AvailableAppointmentIntervalResponse;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.AppointmentRepository;
 import com.example.demo.repository.DoctorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -25,15 +24,16 @@ import java.util.stream.Collectors;
 
 @Service
 public class AppointmentServiceImpl implements AppointmentService {
-
-    @Autowired
     private AppointmentRepository appointmentRepository;
-    @Autowired
     private DoctorRepository doctorRepository;
-    @Autowired
     private AccountRepository accountRepository;
-
     private static final ZoneId DEFAULT_TIMEZONE_ID = ZoneId.systemDefault();
+
+    public AppointmentServiceImpl(AppointmentRepository appointmentRepository, DoctorRepository doctorRepository, AccountRepository accountRepository){
+        this.appointmentRepository = appointmentRepository;
+        this.doctorRepository = doctorRepository;
+        this.accountRepository = accountRepository;
+    }
 
     @Override
     public List<AvailableAppointmentIntervalResponse> getDoctorAppointmentIntervals(UUID doctorId) {
@@ -130,10 +130,10 @@ public class AppointmentServiceImpl implements AppointmentService {
                 updatedAppointment.getStatus());
     }
 
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "*/5 * * * * ?")
     @Override
     public void markExpiredAppointments() {
-        final List<Appointment> expiredAppointments = this.appointmentRepository.findByStatusAndAppointmentDateIsBefore(AppointmentStatus.ACTIVE, Instant.now().minus(15, ChronoUnit.MINUTES));
+         final List<Appointment> expiredAppointments = this.appointmentRepository.findByStatusAndAppointmentDateIsBefore(AppointmentStatus.ACTIVE, Instant.now().minus(15, ChronoUnit.MINUTES));
         expiredAppointments.forEach(ea -> ea.setStatus(AppointmentStatus.EXPIRED));
         this.appointmentRepository.saveAll(expiredAppointments);
     }

@@ -4,12 +4,7 @@ import com.example.demo.models.request.CreateAccountRequest;
 import com.example.demo.models.request.LoginRequest;
 import com.example.demo.models.request.UpdateAccountRequest;
 import com.example.demo.models.response.AccountResponse;
-import com.example.demo.models.response.AppointmentResponse;
-import com.example.demo.models.response.DoctorResponse;
 import com.example.demo.services.AccountService;
-import com.example.demo.services.AppointmentService;
-import com.example.demo.services.DoctorService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,14 +14,12 @@ import java.util.UUID;
 @RequestMapping("/account")
 @CrossOrigin("http://localhost:3000/")
 public class AccountController {
-    @Autowired
+
     private AccountService accountService;
 
-    @Autowired
-    private AppointmentService appointmentService;
-
-    @Autowired
-    private DoctorService doctorService;
+    public AccountController(AccountService accountService) {
+        this.accountService = accountService;
+    }
 
     @PostMapping("/signup")
     public AccountResponse add(@RequestBody CreateAccountRequest createAccountRequest) {
@@ -41,20 +34,6 @@ public class AccountController {
     @GetMapping("/data")
     public AccountResponse getAccountData(@RequestParam UUID uuid){
         return accountService.getAccountData(uuid);
-    }
-    @GetMapping("/appointments")
-    public List<AppointmentResponse> getPatientAppointments(@RequestParam UUID uuid){
-        return appointmentService.getAppointmentsByPatientId(uuid);
-    }
-
-    @GetMapping("/doctor/data")
-    public DoctorResponse getDoctorData(@RequestParam UUID uuid){
-        return doctorService.getDoctorByAccountId(uuid);
-    }
-
-    @GetMapping("/doctor/appointments")
-    public List<AppointmentResponse> getDoctorAppointments(@RequestParam UUID uuid){
-        return appointmentService.getAppointmentsByDoctorId(uuid);
     }
 
     @GetMapping("/all")

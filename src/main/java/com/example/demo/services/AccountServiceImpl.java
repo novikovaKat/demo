@@ -7,10 +7,8 @@ import com.example.demo.models.request.CreateAccountRequest;
 import com.example.demo.models.request.LoginRequest;
 import com.example.demo.models.request.UpdateAccountRequest;
 import com.example.demo.models.response.AccountResponse;
-import com.example.demo.models.response.DoctorViewResponse;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.DoctorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,21 +24,22 @@ import java.util.stream.Collectors;
 
 @Service
 public class AccountServiceImpl implements AccountService{
-
-    @Autowired
     private AccountRepository accountRepository;
-
-    @Autowired
     private DoctorRepository doctorRepository;
 
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
     private AuthenticationManager authenticationManager;
-
-    @Autowired
     private DoctorService doctorService;
+
+    public AccountServiceImpl(AccountRepository accountRepository, DoctorRepository doctorRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, DoctorService doctorService) {
+        this.accountRepository = accountRepository;
+        this.doctorRepository = doctorRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.doctorService = doctorService;
+    }
+
     @Override
     @Transactional
     public AccountResponse saveAccount(CreateAccountRequest request) {
