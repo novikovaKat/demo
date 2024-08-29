@@ -26,13 +26,13 @@ public class AccountController {
         return accountService.saveAccount(createAccountRequest);
     }
 
-    @PostMapping("/login")
-    public AccountResponse authenticateUser(@RequestBody LoginRequest loginRequest) {
-        return accountService.login(loginRequest);
-    }
+//    @PostMapping("/login")
+//    public AccountResponse authenticateUser(@RequestBody LoginRequest loginRequest) {
+//        return accountService.login(loginRequest);
+//    }
 
-    @GetMapping("/data")
-    public AccountResponse getAccountData(@RequestParam UUID uuid){
+    @GetMapping("/{uuid}")
+    public AccountResponse getAccountData(@PathVariable final UUID uuid){
         return accountService.getAccountData(uuid);
     }
 
@@ -41,8 +41,8 @@ public class AccountController {
         return accountService.getAllAccounts();
     }
 
-    @PutMapping("/{uuid}")
+/*    @PutMapping("/{uuid}")
     public AccountResponse updateAccount(@PathVariable final UUID uuid, @RequestBody UpdateAccountRequest updateAccountRequest){
         return accountService.updateAccount(uuid, updateAccountRequest);
-    }
+    }*/
 }

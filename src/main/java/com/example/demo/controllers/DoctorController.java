@@ -23,7 +23,7 @@ public class DoctorController {
         this.appointmentService = appointmentService;
     }
 
-    @GetMapping("/all")
+    @GetMapping()
     public List<DoctorViewResponse> getAllActiveDoctorsInfo(){
         return this.doctorService.getAllActiveDoctorsInfo();
     }
@@ -34,7 +34,7 @@ public class DoctorController {
         return this.doctorService.getDoctorByUuid(doctorId);
     }
 
-    @GetMapping("/{accountId}")
+    @GetMapping("/account/{accountId}")
     public DoctorResponse getDoctorByAccountId(@PathVariable final UUID accountId){
         return doctorService.getDoctorByAccountId(accountId);
     }

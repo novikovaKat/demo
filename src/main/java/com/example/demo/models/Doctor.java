@@ -23,6 +23,9 @@ public class Doctor{
     @Column(name = "status")
     private Boolean status;
 
+    @Column(name = "specialty")
+    private String specialty;
+
     @ManyToMany
     @JoinTable(
             name = "doctor_specialty",

@@ -1,19 +1,13 @@
 package com.example.demo.services;
 
 import com.example.demo.models.Account;
-import com.example.demo.models.Doctor;
-import com.example.demo.models.enums.Role;
 import com.example.demo.models.request.CreateAccountRequest;
-import com.example.demo.models.request.LoginRequest;
-import com.example.demo.models.request.UpdateAccountRequest;
+import com.example.demo.models.request.RegistrationKeycloakRequest;
 import com.example.demo.models.response.AccountResponse;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.DoctorRepository;
+import com.example.demo.security.AuthenticationFacade;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,25 +20,74 @@ import java.util.stream.Collectors;
 public class AccountServiceImpl implements AccountService{
     private AccountRepository accountRepository;
     private DoctorRepository doctorRepository;
-
-    private PasswordEncoder passwordEncoder;
-
-    private AuthenticationManager authenticationManager;
     private DoctorService doctorService;
+    private AuthenticationFacade authenticationFacade;
+    private KeycloakService keycloakService;
 
-    public AccountServiceImpl(AccountRepository accountRepository, DoctorRepository doctorRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, DoctorService doctorService) {
+    public AccountServiceImpl(AccountRepository accountRepository,
+                              DoctorRepository doctorRepository,
+                              DoctorService doctorService,
+                              AuthenticationFacade authenticationFacade,
+                              KeycloakService keycloakService) {
         this.accountRepository = accountRepository;
         this.doctorRepository = doctorRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.authenticationManager = authenticationManager;
         this.doctorService = doctorService;
+        this.authenticationFacade = authenticationFacade;
+        this.keycloakService = keycloakService;
+    }
+
+    @Override
+    public AccountResponse getAccountData(UUID uuid) {
+        Optional<Account> account = accountRepository.findByUuid(uuid);
+        if(account.isEmpty()){
+            throw new RuntimeException("Account doesn`t exist");
+        }
+
+        if(this.authenticationFacade.evaluateByEmail(account.get())){
+            return new AccountResponse(
+                    account.get().getUuid(),
+                    account.get().getFirstName(),
+                    account.get().getLastName(),
+                    account.get().getEmail(),
+                    account.get().getPhone()
+            );
+        }
+        else{
+            throw new RuntimeException("Access denied");
+        }
+    }
+
+    @Override
+    public List<AccountResponse> getAllAccounts() {
+        return this.accountRepository.findAll().stream()
+                .map(account -> new AccountResponse(
+                        account.getUuid(),
+                        account.getFirstName(),
+                        account.getLastName(),
+                        account.getEmail(),
+                        account.getPhone()))
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
     public AccountResponse saveAccount(CreateAccountRequest request) {
+        this.keycloakService.createUser(
+                new RegistrationKeycloakRequest(
+                        request.email(),
+                        request.email(),
+                        request.firstName(),
+                        request.lastName(),
+                        request.password()));
 
-        // add check for email exists in a DB
+        return new AccountResponse(UUID.randomUUID(),
+                request.firstName(),
+                request.lastName(),
+                request.email(),
+                request.phone());
+
+        //TODO work in progress
+        /*// add check for email exists in a DB
         if(accountRepository.existsByEmail(request.email())){
             throw new RuntimeException("Email already taken");
         }
@@ -55,8 +98,7 @@ public class AccountServiceImpl implements AccountService{
         account.setLastName(request.lastName());
         account.setEmail(request.email());
         account.setPhone(request.phone());
-        account.setPassword(passwordEncoder.encode(request.password()));
-        account.setRole(Role.BASIC_USER);
+
 
         Account savedAccount = accountRepository.save(account);
         return new AccountResponse(
@@ -64,11 +106,10 @@ public class AccountServiceImpl implements AccountService{
                 savedAccount.getFirstName(),
                 savedAccount.getLastName(),
                 savedAccount.getEmail(),
-                savedAccount.getPhone(),
-                savedAccount.getRole());
+                savedAccount.getPhone());*/
     }
 
-    @Override
+  /*  @Override
     public AccountResponse login(LoginRequest loginRequest) {
         Optional<Account> account = accountRepository.findByEmail(loginRequest.email());
         if(account.isEmpty()){
@@ -84,42 +125,10 @@ public class AccountServiceImpl implements AccountService{
                 account.get().getFirstName(),
                 account.get().getLastName(),
                 account.get().getEmail(),
-                account.get().getPhone(),
-                account.get().getRole());
-    }
+                account.get().getPhone());
+    }*/
 
-    @Override
-    public AccountResponse getAccountData(UUID uuid) {
-        Optional<Account> account = accountRepository.findByUuid(uuid);
-        if(account.isEmpty()){
-            throw new RuntimeException("Account doesn`t exist");
-        }
-
-        return new AccountResponse(
-                account.get().getUuid(),
-                account.get().getFirstName(),
-                account.get().getLastName(),
-                account.get().getEmail(),
-                account.get().getPhone(),
-                account.get().getRole()
-        );
-
-    }
-
-    @Override
-    public List<AccountResponse> getAllAccounts() {
-        return this.accountRepository.findAll().stream()
-                .map(account -> new AccountResponse(
-                        account.getUuid(),
-                        account.getFirstName(),
-                        account.getLastName(),
-                        account.getEmail(),
-                        account.getPhone(),
-                        account.getRole()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
+   /* @Override
     public AccountResponse updateAccount(UUID uuid, UpdateAccountRequest updateAccountRequest){
         Account account = this.accountRepository.findByUuid(uuid)
                 .orElseThrow(() -> new RuntimeException("No such account"));
@@ -161,5 +170,5 @@ public class AccountServiceImpl implements AccountService{
             }
         }
         account.setRole(role);
-    }
+    }*/
 }

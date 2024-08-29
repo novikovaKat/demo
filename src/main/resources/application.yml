@@ -5,7 +5,25 @@ spring:
     password: katya
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8080/realms/demo
+            user-name-attribute: preferred_username
+        registration:
+          keycloak:
+            client-id: springsecurity
+            client-secret: h53OjmdLTdKmFaa27x4vhNY2jCXCtBJA
+            scope: openid
+server:
+  port: 8081
+keycloak:
+  server-uri: http://localhost:8080
+  realm: demo
+  admin-client-secret: aDfoTG1zRxmutxUvsrvlpbhxw6KdtpG6
+  admin-client-id: admin-cli
 logging:
   level:
     org:

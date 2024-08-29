@@ -9,7 +9,6 @@ public record AccountResponse(
         String firstName,
         String lastName,
         String email,
-        String phone,
-        Role role
+        String phone
 ) {
 }

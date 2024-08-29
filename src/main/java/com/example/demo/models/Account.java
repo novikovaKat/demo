@@ -11,24 +11,18 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "account")
-public class Account{
+public class Account {
     @Id
     @Column(name = "uuid")
     private UUID uuid;
-    @Column (name = "first_name")
+    @Column(name = "first_name")
     private String firstName;
-    @Column (name = "last_name")
+    @Column(name = "last_name")
     private String lastName;
-    @Column (name = "email")
+    @Column(name = "email")
     private String email;
-    @Column (name = "phone")
+    @Column(name = "phone")
     private String phone;
-
-    @Column (name = "password")
-    private String password;
-
-    @Column
-    private Role role;
 
     public UUID getUuid() {
         return uuid;
@@ -70,31 +64,17 @@ public class Account{
         this.phone = phone;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Account account)) return false;
-        return uuid.equals(account.uuid) && firstName.equals(account.firstName) && lastName.equals(account.lastName) && email.equals(account.email) && Objects.equals(phone, account.phone) && password.equals(account.password) && role == account.role;
+        if (!(o instanceof Account)) return false;
+        Account account = (Account) o;
+        return uuid.equals(account.uuid) && firstName.equals(account.firstName) && lastName.equals(account.lastName) && email.equals(account.email) && Objects.equals(phone, account.phone);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uuid, firstName, lastName, email, phone, password, role);
+        return Objects.hash(uuid, firstName, lastName, email, phone);
     }
 }
+

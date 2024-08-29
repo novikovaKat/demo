@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.UUID;
 
 public interface AccountService {
-    public AccountResponse saveAccount(CreateAccountRequest createAccountRequest);
+    AccountResponse saveAccount(CreateAccountRequest createAccountRequest);
 
-    AccountResponse login(LoginRequest loginRequest);
+//    AccountResponse login(LoginRequest loginRequest);
 
     AccountResponse getAccountData(UUID uuid);
 
     List<AccountResponse> getAllAccounts();
 
-    AccountResponse updateAccount(UUID uuid, UpdateAccountRequest updateAccountRequest);
+//    AccountResponse updateAccount(UUID uuid, UpdateAccountRequest updateAccountRequest);
 }
