@@ -17,5 +17,7 @@ public interface AccountService {
 
     List<AccountResponse> getAllAccounts();
 
-//    AccountResponse updateAccount(UUID uuid, UpdateAccountRequest updateAccountRequest);
+    AccountResponse deleteAccount(String email);
+
+    AccountResponse updateAccount(UUID uuid, UpdateAccountRequest updateAccountRequest);
 }

@@ -3,6 +3,8 @@ package com.example.demo.services;
 import com.example.demo.models.Account;
 import com.example.demo.models.request.CreateAccountRequest;
 import com.example.demo.models.request.RegistrationKeycloakRequest;
+import com.example.demo.models.request.UpdateAccountRequest;
+import com.example.demo.models.request.UpdateKeycloakRequest;
 import com.example.demo.models.response.AccountResponse;
 import com.example.demo.repository.AccountRepository;
 import com.example.demo.repository.DoctorRepository;
@@ -70,87 +72,71 @@ public class AccountServiceImpl implements AccountService{
     }
 
     @Override
-    @Transactional
-    public AccountResponse saveAccount(CreateAccountRequest request) {
-        this.keycloakService.createUser(
-                new RegistrationKeycloakRequest(
-                        request.email(),
-                        request.email(),
-                        request.firstName(),
-                        request.lastName(),
-                        request.password()));
-
-        return new AccountResponse(UUID.randomUUID(),
-                request.firstName(),
-                request.lastName(),
-                request.email(),
-                request.phone());
-
-        //TODO work in progress
-        /*// add check for email exists in a DB
-        if(accountRepository.existsByEmail(request.email())){
-            throw new RuntimeException("Email already taken");
-        }
-
-        Account account = new Account();
-        account.setUuid(UUID.randomUUID());
-        account.setFirstName(request.firstName());
-        account.setLastName(request.lastName());
-        account.setEmail(request.email());
-        account.setPhone(request.phone());
-
-
-        Account savedAccount = accountRepository.save(account);
-        return new AccountResponse(
-                savedAccount.getUuid(),
-                savedAccount.getFirstName(),
-                savedAccount.getLastName(),
-                savedAccount.getEmail(),
-                savedAccount.getPhone());*/
+    public AccountResponse deleteAccount(String email) {
+        return null;
     }
 
-  /*  @Override
-    public AccountResponse login(LoginRequest loginRequest) {
-        Optional<Account> account = accountRepository.findByEmail(loginRequest.email());
-        if(account.isEmpty()){
-            throw new RuntimeException("Account doesn`t exist");
+    @Override
+    @Transactional
+    public AccountResponse saveAccount(CreateAccountRequest request) {
+        if(!accountRepository.existsByEmail(request.email())){
+            this.keycloakService.createUser(
+                    new RegistrationKeycloakRequest(
+                            request.email(),
+                            request.email(),
+                            request.firstName(),
+                            request.lastName(),
+                            request.password()));
+
+            Account account = new Account();
+            account.setUuid(UUID.randomUUID());
+            account.setFirstName(request.firstName());
+            account.setLastName(request.lastName());
+            account.setEmail(request.email());
+            account.setPhone(request.phone());
+
+            Account savedAccount = accountRepository.save(account);
+            return new AccountResponse(
+                    savedAccount.getUuid(),
+                    savedAccount.getFirstName(),
+                    savedAccount.getLastName(),
+                    savedAccount.getEmail(),
+                    savedAccount.getPhone());
         }
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                loginRequest.email(), loginRequest.password());
-        Authentication authentication = authenticationManager.authenticate(token);
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        return new AccountResponse(
-                account.get().getUuid(),
-                account.get().getFirstName(),
-                account.get().getLastName(),
-                account.get().getEmail(),
-                account.get().getPhone());
-    }*/
-
-   /* @Override
+        else{
+            throw new RuntimeException("Email already taken");
+        }
+    }
+    @Override
     public AccountResponse updateAccount(UUID uuid, UpdateAccountRequest updateAccountRequest){
         Account account = this.accountRepository.findByUuid(uuid)
                 .orElseThrow(() -> new RuntimeException("No such account"));
         Optional.ofNullable(updateAccountRequest.firstName()).ifPresent(account::setFirstName);
         Optional.ofNullable(updateAccountRequest.lastName()).ifPresent(account::setLastName);
-        Optional.ofNullable(updateAccountRequest.email()).ifPresent(account::setEmail);
         Optional.ofNullable(updateAccountRequest.phone()).ifPresent(account::setPhone);
-        Optional.ofNullable(updateAccountRequest.role()).ifPresent(f -> this.changeRole(Role.valueOf(f), account));
 
         Account updatedAccount = this.accountRepository.save(account);
 
-
+        if(Optional.ofNullable(updateAccountRequest.firstName()).isPresent()
+                || Optional.ofNullable(updateAccountRequest.lastName()).isPresent()){
+            this.keycloakService.updateUser(
+                    updatedAccount.getEmail(),
+                    new UpdateKeycloakRequest(
+                            updatedAccount.getFirstName(),
+                            updatedAccount.getLastName()
+                            )
+            );
+        }
 
         return new AccountResponse(
                 updatedAccount.getUuid(),
                 updatedAccount.getFirstName(),
                 updatedAccount.getLastName(),
                 updatedAccount.getEmail(),
-                updatedAccount.getPhone(),
-                updatedAccount.getRole());
+                updatedAccount.getPhone());
     }
 
+    /*
     private void changeRole(Role role, Account account){
         switch (role){
             case BASIC_USER, ADMIN -> {

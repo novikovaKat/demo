@@ -41,8 +41,10 @@ public class AccountController {
         return accountService.getAllAccounts();
     }
 
-/*    @PutMapping("/{uuid}")
+    @PutMapping("/{uuid}")
     public AccountResponse updateAccount(@PathVariable final UUID uuid, @RequestBody UpdateAccountRequest updateAccountRequest){
         return accountService.updateAccount(uuid, updateAccountRequest);
-    }*/
+    }
+
+
 }
